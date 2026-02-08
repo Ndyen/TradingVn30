@@ -1,0 +1,69 @@
+Tony, dưới đây là báo cáo “thuật toán lọc cổ phiếu” của ứng dụng (mục tiêu: chọn Top 3 VN30 có điểm mua tốt nhất cho trading ngắn hạn, rủi ro vừa phải), theo đúng tinh thần: có điểm số – giải thích được – chạy được theo dữ liệu vnstock.
+
+🌿🎒🌲✨
+
+🌿 1) Mục tiêu & triết lý lọc
+🎒 Ứng dụng không “dự đoán giá” kiểu thần học; nó xếp hạng xác suất setup đẹp dựa trên hành vi giá–khối lượng gần đây.
+🌲 Ưu tiên setup dễ thắng: nền giá chặt + tín hiệu bứt/đảo chiều hợp lý + volume xác nhận + không quá “đu đỉnh”.
+✨ Kết quả cuối cùng: Top 3 mã + kế hoạch vào/thoát (entry–stop–TP) kèm lý do.
+
+🌿 2) Dữ liệu đầu vào
+🎒 Universe: VN30 (theo danh sách hiệu lực).
+🌲 Nến 1D là “xương sống”. Nếu có intraday (1H/15m) thì dùng để tinh chỉnh timing, không có vẫn chạy bình thường.
+✨ Dữ liệu tối thiểu: ~120 cây nến ngày để tính MA/ATR/RSI ổn định.
+
+🌿 3) Pipeline thuật toán (luồng xử lý)
+🎒 Bước A — Load & chuẩn hoá dữ liệu
+🌲 Lấy OHLCV từ vnstock → chuẩn hoá timezone/khuyết dữ liệu → loại outlier rõ rệt (nến lỗi).
+✨ Cache vào DB để lần sau chạy nhanh, giảm gọi API.
+
+🎒 Bước B — Tính chỉ báo & đặc trưng (features)
+🌲 Chỉ báo chính (nhẹ – hiệu quả cho short-term):
+✨ EMA20/EMA50, RSI14, ATR14, độ co hẹp biến động (BB width hoặc ATR-based squeeze), pivot high/low gần nhất, volume vs volMA20.
+
+🎒 Bước C — Chấm điểm theo 6 nhóm tín hiệu
+🌲 Mỗi nhóm ra điểm 0–100, sau đó nhân trọng số → ra điểm tổng 0–100.
+
+🎒 Bước D — Phạt điểm (penalties) & lọc điều kiện tối thiểu
+🌲 Loại mã dữ liệu thiếu, thanh khoản kém, hoặc “quá kéo” rủi ro cao.
+✨ Sau đó xếp hạng và chọn Top 3.
+
+🎒 Bước E — Sinh “trade plan”
+🌲 Gợi ý entry zone, stop loss, TP dựa trên cấu trúc + ATR, để đúng tiêu chí rủi ro vừa phải.
+✨ Lưu report + breakdown để API trả ngay.
+
+🌿 4) Bộ chấm điểm (core) — 6 nhóm tiêu chí
+🎒 (1) Trend Score — xu hướng ngắn hạn có lợi
+🌲 Điểm cao khi: EMA20 > EMA50, EMA20 đang dốc lên, giá giữ trên EMA20/50.
+✨ Điểm thấp khi: trend gãy, EMA20 cắt xuống EMA50, giá bị đè dưới EMA20.
+
+🎒 (2) Base Score — chất lượng nền giá
+🌲 Điểm cao khi: biên độ co hẹp, “nén” dần (range contraction), volatility squeeze (BB width/ATR giảm).
+✨ Nền càng chặt càng dễ bứt, short-term thích nhất loại này.
+
+🎒 (3) Breakout/Trigger Score — tín hiệu kích hoạt mua
+🌲 Điểm cao khi:
+✨ đóng cửa gần đỉnh ngày (close near high), vượt pivot gần nhất, hoặc “reclaim” EMA20/50 sau nhịp rũ.
+🎒 Nếu chưa breakout rõ, nhưng xuất hiện “reversal candle” tại hỗ trợ + volume tốt → vẫn có điểm khá.
+
+🎒 (4) Volume Score — khối lượng xác nhận
+🌲 Điểm cao khi: volume > volMA20, volume tăng đúng lúc phá nền/đảo chiều, up-volume mạnh hơn down-volume.
+✨ Volume là “chữ ký” của dòng tiền, thiếu volume thì breakout dễ fail.
+
+🎒 (5) Momentum Score — động lượng vừa đủ, không quá nóng
+🌲 RSI14 nằm vùng “khỏe” (thường ~45–65 cho continuation) sẽ đẹp.
+✨ RSI quá cao (ví dụ >75) bị coi là “quá nhiệt” → dễ bị phạt vì rủi ro đảo chiều.
+
+🎒 (6) Risk Score — rủi ro / phần thưởng hợp lý
+🌲 Điểm cao khi: stop loss gần (dựa swing low/EMA50) so với ATR, tức “thua ít khi sai”.
+✨ Mã cần stop quá rộng, hoặc giá xa EMA20 quá nhiều → giảm điểm.
+
+🌿 5) Trọng số điểm (mặc định)
+🎒 Trend 0.22
+🌲 Base 0.20
+✨ Breakout 0.22
+🎒 Volume 0.18
+🌲 Momentum 0.10
+✨ Risk 0.08
+
+(Thiết kế để ưu tiên “setup hành động được” thay vì chỉ đẹp về trend.)

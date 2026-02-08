@@ -1,0 +1,14 @@
+Init Quote...
+Init failed: Symbol must be between 3 and 12 characters long.
+Traceback (most recent call last):
+  File "D:\AI\AntiGravityWS\TradingVn30\debug_quote_v2.py", line 13, in <module>
+    quote = Quote(source='vci', show_log=True)
+  File "C:\Users\84378\AppData\Local\Programs\Python\Python310\lib\site-packages\vnstock\api\quote.py", line 74, in __init__
+    super().__init__(
+  File "C:\Users\84378\AppData\Local\Programs\Python\Python310\lib\site-packages\vnstock\base.py", line 68, in __init__
+    self._provider = impl_cls(**init_kwargs)
+  File "C:\Users\84378\AppData\Local\Programs\Python\Python310\lib\site-packages\vnstock\explorer\vci\quote.py", line 61, in __init__
+    self.symbol = validate_symbol(symbol)
+  File "C:\Users\84378\AppData\Local\Programs\Python\Python310\lib\site-packages\vnstock\core\utils\validation.py", line 24, in validate_symbol
+    raise ValueError("Symbol must be between 3 and 12 characters long.")
+ValueError: Symbol must be between 3 and 12 characters long.

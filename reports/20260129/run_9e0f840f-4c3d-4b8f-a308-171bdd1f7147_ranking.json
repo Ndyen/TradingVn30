@@ -1,0 +1,562 @@
+[
+  {
+    "symbol": "MWG",
+    "score_total": 93.2,
+    "breakdown": {
+      "trend": 100,
+      "base": 100,
+      "breakout": 80,
+      "volume": 100,
+      "momentum": 100,
+      "risk": 70
+    },
+    "signal": {
+      "entry_zone": {
+        "from": 89.5,
+        "to": 90.4
+      },
+      "stop_loss": 84.98,
+      "take_profit_1": 97.17,
+      "take_profit_2": 101.69,
+      "invalidation": {
+        "level": 84.98,
+        "type": "technical_support"
+      },
+      "key_reasons": [],
+      "risk_notes": []
+    },
+    "row": {}
+  },
+  {
+    "symbol": "MSN",
+    "score_total": 67.6,
+    "breakdown": {
+      "trend": 100,
+      "base": 30,
+      "breakout": 80,
+      "volume": 100,
+      "momentum": 100,
+      "risk": 50
+    },
+    "signal": {
+      "entry_zone": {
+        "from": 84.1,
+        "to": 84.94
+      },
+      "stop_loss": 77.9,
+      "take_profit_1": 94.25,
+      "take_profit_2": 100.45,
+      "invalidation": {
+        "level": 77.9,
+        "type": "technical_support"
+      },
+      "key_reasons": [],
+      "risk_notes": []
+    },
+    "row": {}
+  },
+  {
+    "symbol": "MBB",
+    "score_total": 67.2,
+    "breakdown": {
+      "trend": 100,
+      "base": 100,
+      "breakout": 0,
+      "volume": 40,
+      "momentum": 100,
+      "risk": 100
+    },
+    "signal": {
+      "entry_zone": {
+        "from": 26.7,
+        "to": 26.97
+      },
+      "stop_loss": 26.2,
+      "take_profit_1": 27.72,
+      "take_profit_2": 28.22,
+      "invalidation": {
+        "level": 26.2,
+        "type": "technical_support"
+      },
+      "key_reasons": [],
+      "risk_notes": []
+    },
+    "row": {}
+  },
+  {
+    "symbol": "BVH",
+    "score_total": 61.2,
+    "breakdown": {
+      "trend": 100,
+      "base": 70,
+      "breakout": 0,
+      "volume": 40,
+      "momentum": 100,
+      "risk": 100
+    },
+    "signal": {
+      "entry_zone": {
+        "from": 69.1,
+        "to": 69.79
+      },
+      "stop_loss": 65.96,
+      "take_profit_1": 74.5,
+      "take_profit_2": 77.64,
+      "invalidation": {
+        "level": 65.96,
+        "type": "technical_support"
+      },
+      "key_reasons": [],
+      "risk_notes": []
+    },
+    "row": {}
+  },
+  {
+    "symbol": "STB",
+    "score_total": 58.8,
+    "breakdown": {
+      "trend": 100,
+      "base": 70,
+      "breakout": 0,
+      "volume": 40,
+      "momentum": 100,
+      "risk": 70
+    },
+    "signal": {
+      "entry_zone": {
+        "from": 62.8,
+        "to": 63.43
+      },
+      "stop_loss": 57.67,
+      "take_profit_1": 71.12,
+      "take_profit_2": 76.25,
+      "invalidation": {
+        "level": 57.67,
+        "type": "technical_support"
+      },
+      "key_reasons": [],
+      "risk_notes": []
+    },
+    "row": {}
+  },
+  {
+    "symbol": "FPT",
+    "score_total": 56.2,
+    "breakdown": {
+      "trend": 100,
+      "base": 30,
+      "breakout": 0,
+      "volume": 70,
+      "momentum": 100,
+      "risk": 70
+    },
+    "signal": {
+      "entry_zone": {
+        "from": 106.1,
+        "to": 107.16
+      },
+      "stop_loss": 99.41,
+      "take_profit_1": 117.2,
+      "take_profit_2": 123.89,
+      "invalidation": {
+        "level": 99.41,
+        "type": "technical_support"
+      },
+      "key_reasons": [],
+      "risk_notes": []
+    },
+    "row": {}
+  },
+  {
+    "symbol": "SAB",
+    "score_total": 53.2,
+    "breakdown": {
+      "trend": 100,
+      "base": 30,
+      "breakout": 0,
+      "volume": 40,
+      "momentum": 100,
+      "risk": 100
+    },
+    "signal": {
+      "entry_zone": {
+        "from": 50.3,
+        "to": 50.8
+      },
+      "stop_loss": 48.56,
+      "take_profit_1": 53.42,
+      "take_profit_2": 55.16,
+      "invalidation": {
+        "level": 48.56,
+        "type": "technical_support"
+      },
+      "key_reasons": [],
+      "risk_notes": []
+    },
+    "row": {}
+  },
+  {
+    "symbol": "CTG",
+    "score_total": 52.4,
+    "breakdown": {
+      "trend": 60,
+      "base": 70,
+      "breakout": 0,
+      "volume": 40,
+      "momentum": 100,
+      "risk": 100
+    },
+    "signal": {
+      "entry_zone": {
+        "from": 38.3,
+        "to": 38.68
+      },
+      "stop_loss": 33.9,
+      "take_profit_1": 45.28,
+      "take_profit_2": 49.67,
+      "invalidation": {
+        "level": 33.9,
+        "type": "technical_support"
+      },
+      "key_reasons": [],
+      "risk_notes": []
+    },
+    "row": {}
+  },
+  {
+    "symbol": "HDB",
+    "score_total": 52.4,
+    "breakdown": {
+      "trend": 60,
+      "base": 100,
+      "breakout": 0,
+      "volume": 40,
+      "momentum": 40,
+      "risk": 100
+    },
+    "signal": {
+      "entry_zone": {
+        "from": 27.85,
+        "to": 28.13
+      },
+      "stop_loss": 26.27,
+      "take_profit_1": 30.5,
+      "take_profit_2": 32.07,
+      "invalidation": {
+        "level": 26.27,
+        "type": "technical_support"
+      },
+      "key_reasons": [],
+      "risk_notes": []
+    },
+    "row": {}
+  },
+  {
+    "symbol": "BID",
+    "score_total": 50.8,
+    "breakdown": {
+      "trend": 100,
+      "base": 30,
+      "breakout": 0,
+      "volume": 40,
+      "momentum": 100,
+      "risk": 70
+    },
+    "signal": {
+      "entry_zone": {
+        "from": 51.9,
+        "to": 52.42
+      },
+      "stop_loss": 47.75,
+      "take_profit_1": 58.65,
+      "take_profit_2": 62.8,
+      "invalidation": {
+        "level": 47.75,
+        "type": "technical_support"
+      },
+      "key_reasons": [],
+      "risk_notes": []
+    },
+    "row": {}
+  },
+  {
+    "symbol": "PLX",
+    "score_total": 49.2,
+    "breakdown": {
+      "trend": 100,
+      "base": 30,
+      "breakout": 0,
+      "volume": 40,
+      "momentum": 100,
+      "risk": 50
+    },
+    "signal": {
+      "entry_zone": {
+        "from": 57.7,
+        "to": 58.28
+      },
+      "stop_loss": 49.58,
+      "take_profit_1": 70.46,
+      "take_profit_2": 78.59,
+      "invalidation": {
+        "level": 49.58,
+        "type": "technical_support"
+      },
+      "key_reasons": [],
+      "risk_notes": []
+    },
+    "row": {}
+  },
+  {
+    "symbol": "HPG",
+    "score_total": 46.6,
+    "breakdown": {
+      "trend": 70,
+      "base": 30,
+      "breakout": 0,
+      "volume": 40,
+      "momentum": 100,
+      "risk": 100
+    },
+    "signal": {
+      "entry_zone": {
+        "from": 27.1,
+        "to": 27.37
+      },
+      "stop_loss": 26.54,
+      "take_profit_1": 28.21,
+      "take_profit_2": 28.77,
+      "invalidation": {
+        "level": 26.54,
+        "type": "technical_support"
+      },
+      "key_reasons": [],
+      "risk_notes": []
+    },
+    "row": {}
+  },
+  {
+    "symbol": "POW",
+    "score_total": 46.4,
+    "breakdown": {
+      "trend": 60,
+      "base": 70,
+      "breakout": 0,
+      "volume": 40,
+      "momentum": 40,
+      "risk": 100
+    },
+    "signal": {
+      "entry_zone": {
+        "from": 13.4,
+        "to": 13.53
+      },
+      "stop_loss": 12.22,
+      "take_profit_1": 15.31,
+      "take_profit_2": 16.5,
+      "invalidation": {
+        "level": 12.22,
+        "type": "technical_support"
+      },
+      "key_reasons": [],
+      "risk_notes": []
+    },
+    "row": {}
+  },
+  {
+    "symbol": "GAS",
+    "score_total": 43.2,
+    "breakdown": {
+      "trend": 100,
+      "base": 70,
+      "breakout": 0,
+      "volume": 40,
+      "momentum": 60,
+      "risk": 50
+    },
+    "signal": {
+      "entry_zone": {
+        "from": 116.8,
+        "to": 117.97
+      },
+      "stop_loss": 97.55,
+      "take_profit_1": 146.85,
+      "take_profit_2": 166.1,
+      "invalidation": {
+        "level": 97.55,
+        "type": "technical_support"
+      },
+      "key_reasons": [],
+      "risk_notes": []
+    },
+    "row": {}
+  },
+  {
+    "symbol": "GVR",
+    "score_total": 40.6,
+    "breakdown": {
+      "trend": 100,
+      "base": 30,
+      "breakout": 0,
+      "volume": 70,
+      "momentum": 60,
+      "risk": 50
+    },
+    "signal": {
+      "entry_zone": {
+        "from": 40.85,
+        "to": 41.26
+      },
+      "stop_loss": 34.45,
+      "take_profit_1": 50.86,
+      "take_profit_2": 57.26,
+      "invalidation": {
+        "level": 34.45,
+        "type": "technical_support"
+      },
+      "key_reasons": [],
+      "risk_notes": []
+    },
+    "row": {}
+  },
+  {
+    "symbol": "TCB",
+    "score_total": 39.2,
+    "breakdown": {
+      "trend": 0,
+      "base": 100,
+      "breakout": 0,
+      "volume": 40,
+      "momentum": 40,
+      "risk": 100
+    },
+    "signal": {
+      "entry_zone": {
+        "from": 34.9,
+        "to": 35.25
+      },
+      "stop_loss": 33.31,
+      "take_profit_1": 37.63,
+      "take_profit_2": 39.22,
+      "invalidation": {
+        "level": 33.31,
+        "type": "technical_support"
+      },
+      "key_reasons": [],
+      "risk_notes": []
+    },
+    "row": {}
+  },
+  {
+    "symbol": "BCM",
+    "score_total": 25.2,
+    "breakdown": {
+      "trend": 0,
+      "base": 30,
+      "breakout": 0,
+      "volume": 40,
+      "momentum": 40,
+      "risk": 100
+    },
+    "signal": {
+      "entry_zone": {
+        "from": 66.0,
+        "to": 66.66
+      },
+      "stop_loss": 58.77,
+      "take_profit_1": 77.51,
+      "take_profit_2": 84.74,
+      "invalidation": {
+        "level": 58.77,
+        "type": "technical_support"
+      },
+      "key_reasons": [],
+      "risk_notes": []
+    },
+    "row": {}
+  },
+  {
+    "symbol": "SHB",
+    "score_total": 25.2,
+    "breakdown": {
+      "trend": 0,
+      "base": 30,
+      "breakout": 0,
+      "volume": 40,
+      "momentum": 40,
+      "risk": 100
+    },
+    "signal": {
+      "entry_zone": {
+        "from": 15.95,
+        "to": 16.11
+      },
+      "stop_loss": 15.46,
+      "take_profit_1": 16.85,
+      "take_profit_2": 17.34,
+      "invalidation": {
+        "level": 15.46,
+        "type": "technical_support"
+      },
+      "key_reasons": [],
+      "risk_notes": []
+    },
+    "row": {}
+  },
+  {
+    "symbol": "SSB",
+    "score_total": 25.2,
+    "breakdown": {
+      "trend": 0,
+      "base": 30,
+      "breakout": 0,
+      "volume": 40,
+      "momentum": 40,
+      "risk": 100
+    },
+    "signal": {
+      "entry_zone": {
+        "from": 17.45,
+        "to": 17.62
+      },
+      "stop_loss": 16.84,
+      "take_profit_1": 18.54,
+      "take_profit_2": 19.15,
+      "invalidation": {
+        "level": 16.84,
+        "type": "technical_support"
+      },
+      "key_reasons": [],
+      "risk_notes": []
+    },
+    "row": {}
+  },
+  {
+    "symbol": "SSI",
+    "score_total": 25.2,
+    "breakdown": {
+      "trend": 0,
+      "base": 30,
+      "breakout": 0,
+      "volume": 40,
+      "momentum": 40,
+      "risk": 100
+    },
+    "signal": {
+      "entry_zone": {
+        "from": 31.15,
+        "to": 31.46
+      },
+      "stop_loss": 28.13,
+      "take_profit_1": 35.99,
+      "take_profit_2": 39.01,
+      "invalidation": {
+        "level": 28.13,
+        "type": "technical_support"
+      },
+      "key_reasons": [],
+      "risk_notes": []
+    },
+    "row": {}
+  }
+]
