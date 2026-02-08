@@ -45,9 +45,10 @@ class TelegramBot:
         now_str = datetime.now().strftime("%Y-%m-%d %H:%M")
 
         lines = [f"👔 **VN30 EXECUTIVE BRIEFING**"]
-        lines.append(f"🗓 *{now_str}* | Run: `{run_id[:8]}`")
+        lines.append(f"🗓 *{now_str}* | Run: `{str(run_id)[:8]}`")
         lines.append("")
         lines.append("**TOP HIGH-CONVICTION SETUPS**")
+
         lines.append("─" * 20)
 
         for i, item in enumerate(top3):

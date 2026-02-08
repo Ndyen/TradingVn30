@@ -38,44 +38,11 @@ async def pipeline_job():
         # But for MVP, let's call the CLI command via subprocess?
         # No, subprocess is heavy. Let's use the code we verified in debug_report.py but modularized.
         
-        async with AsyncSessionLocal() as db:
-            # Get symbols
-            res = await db.execute(text("SELECT symbol, symbol_id FROM trading.market_symbol"))
-            symbols_map = {r[0]: r[1] for r in res.fetchall()}
-            symbols = list(symbols_map.keys())
+        # 1. Backfill (Last 5 days to be safe and fast)
+        logger.info("Step 1: Backfilling data...")
         
-        # Backfill
-        client = VnStockClient()
-        # For simplicity, backfill all 30 symbols, last 5 days
-        end = datetime.now()
-        start = end - timedelta(days=5)
-        start_str = start.strftime("%Y-%m-%d")
-        end_str = end.strftime("%Y-%m-%d")
-        
-        async with AsyncSessionLocal() as db:
-            for sym in symbols:
-                try:
-                    df = client.fetch_ohlcv(sym, start_str, end_str, "1D")
-                    if df is not None and not df.empty:
-                        # Ingest (simplified insert)
-                        # We need proper ingestion logic here. 
-                        # To save time, I will assume ingestion is similar to what backfill command does.
-                        # Actually, backfill command DOES ingestion. 
-                        # Let's import the specific function if possible, or WRITE raw SQL insert like we did manually?
-                        # Writing raw SQL insert here for safety since ORM is iffy.
-                        for _, row in df.iterrows():
-                            # time as ts
-                            ts = row.get('time', row.get('t'))
-                            if not ts: continue
-                                
-                            # basic insert
-                            # We'll skip complex Upsert logic for now and blindly insert ON CONFLICT DO NOTHING
-                            pass 
-                            # Wait, re-implementing backfill here is risky.
-                            # Calling the CLI command `backfill-ohlcv` via asyncio subprocess is SAFER and REUSES tested code.
-                            
-                except Exception as e:
-                    logger.error(f"Backfill error for {sym}: {e}")
+        # We rely entirely on the CLI command for backfill to ensure consistency and use the rate-limited DataProvider.
+
 
         # Usage of CLI via subprocess for robustness
         import sys

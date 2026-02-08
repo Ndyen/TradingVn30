@@ -2,7 +2,9 @@ import typer
 import asyncio
 import sys
 import logging
+import pandas as pd
 from datetime import datetime
+
 from src.app.db.init_db import init_db as init_db_func
 from src.app.db.session import AsyncSessionLocal
 from src.app.data_provider.universe_manager import UniverseManager
@@ -66,8 +68,10 @@ def backfill_ohlcv(days: int = 365, universe: str = "VN30"):
                 logger.info(f"Processing {sym}...")
                 try:
                     await dp.get_ohlcv(sym, days=days)
+                    await db.commit()
                 except Exception as e:
                     logger.error(f"Error backfilling {sym}: {e}")
+                    await db.rollback()
     
     asyncio.run(_do())
 
@@ -87,7 +91,9 @@ def run(
     from src.app.db.models import AnalysisRun, RunScore, RunSignal, RunReport, Strategy, Universe, Timeframe
     from sqlalchemy import select
     from sqlalchemy.dialects.postgresql import insert
+    from src.app.notification.telegram import TelegramBot
     import uuid
+
     
     async def _do():
         async with AsyncSessionLocal() as db:
@@ -114,8 +120,11 @@ def run(
                 universe_id=univ_obj.universe_id,
                 timeframe_id=tf_obj.timeframe_id,
                 strategy_id=strat_obj.strategy_id,
+
                 as_of=datetime.now(),
+                started_at=datetime.now(),
                 status='running'
+
             )
             db.add(run_rec)
             await db.commit()
@@ -124,8 +133,10 @@ def run(
                 # 2. Fetch Data
                 # Get members
                 # ... reused logic from backfill or just query members ...
-                stmt = select(MarketSymbol).join(UniverseMember).where(UniverseMember.universe_id == univ_obj.universe_id)
-                symbols = (await db.execute(stmt)).scalars().all()
+                stmt = select(MarketSymbol.symbol, MarketSymbol.symbol_id).join(UniverseMember, MarketSymbol.symbol_id == UniverseMember.symbol_id).where(UniverseMember.universe_id == univ_obj.universe_id)
+                symbols = (await db.execute(stmt)).all()
+
+
                 
                 logger.info(f"Analyzing {len(symbols)} symbols for run {run_id}...")
                 
@@ -140,9 +151,14 @@ def run(
                         df = await dp.get_ohlcv(sym.symbol, timeframe=timeframe, days=200) # need enough for indicators
                         if df.empty or len(df) < 50:
                             continue
+                        
+                        # Convert to float (fix for Decimal type from DB)
+                        cols = ['open', 'high', 'low', 'close', 'volume']
+                        df[cols] = df[cols].apply(pd.to_numeric, errors='coerce')
                             
                         # Calc Indicators
                         df = calculate_indicators(df)
+
                         
                         # Score
                         score_res = scorer.calculate_score(df)
@@ -172,9 +188,13 @@ def run(
                             score_volume=score_res['breakdown']['volume'],
                             score_momentum=score_res['breakdown']['momentum'],
                             score_risk=score_res['breakdown']['risk'],
-                            penalties=score_res['penalties'],
-                            features={} # omitted for brevity
+                            penalties=score_res.get('penalties', []),
+                            features={k: (v.isoformat() if isinstance(v, pd.Timestamp) else float(v) if isinstance(v, (int, float)) else str(v)) 
+                                     for k, v in df.iloc[-1].to_dict().items() if not pd.isna(v)} if not df.empty else {},
+                            computed_at=datetime.now()
                         )
+
+
                         db.add(rs)
                         
                         # RunSignal
@@ -187,27 +207,46 @@ def run(
                             take_profit_2=signal_res.get('take_profit_2'),
                             invalidation=signal_res.get('invalidation'),
                             key_reasons=signal_res.get('key_reasons', []),
-                            risk_notes=signal_res.get('risk_notes', [])
+                            risk_notes=signal_res.get('risk_notes', []),
+                            created_at=datetime.now()
                         )
+
                         db.add(sig)
+                        await db.commit() # Commit per symbol
                         
                     except Exception as e:
                         logger.error(f"Error processing {sym.symbol}: {e}")
+                        await db.rollback() # Reset session on error
                 
-                await db.commit()
+                # Final commit not needed if we commit per symbol, but harmless
+                # await db.commit() 
+
                 
                 # 3. Rank & Report
                 results.sort(key=lambda x: x['score_total'], reverse=True)
                 top3 = results[:3]
                 
                 # Save RunReport
-                # Serialize for DB
+                # Serialize for DB (convert UUIDs to strings)
+                def serialize_for_json(obj):
+                    if isinstance(obj, dict):
+                        return {k: serialize_for_json(v) for k, v in obj.items()}
+                    elif isinstance(obj, list):
+                        return [serialize_for_json(item) for item in obj]
+                    elif isinstance(obj, uuid.UUID):
+                        return str(obj)
+                    else:
+                        return obj
+                
                 rr = RunReport(
                     run_id=run_id,
-                    top3=[{k:v for k,v in x.items() if k!='row'} for x in top3],
-                    ranking=[{k:v for k,v in x.items() if k!='row'} for x in results],
-                    summary={"count": len(results)}
+                    top3=[serialize_for_json({k:v for k,v in x.items() if k!='row'}) for x in top3],
+                    ranking=[serialize_for_json({k:v for k,v in x.items() if k!='row'}) for x in results],
+                    summary={"count": len(results)},
+                    created_at=datetime.now()
                 )
+
+
                 db.add(rr)
                 
                 # Update status
@@ -219,15 +258,36 @@ def run(
                 rep = Reporter()
                 md_path = rep.save_run_results(str(run_id), top3, results, run_rec.as_of)
                 
+                
+                
                 typer.echo(f"Report generated: {md_path}")
                 for i, item in enumerate(top3):
                     typer.echo(f"{i+1}. {item['symbol']}: {item['score_total']}")
                     
+                # Send Telegram
+                bot = TelegramBot()
+                await bot.send_report(top3, str(run_id))
+
+                    
             except Exception as e:
+                import traceback
+                traceback.print_exc()
+                print(f"CRITICAL ERROR: {e}")
                 logger.error(f"Run failed: {e}")
-                run_rec.status = 'failed'
-                run_rec.error_message = str(e)
-                await db.commit()
+                
+                # Rollback session to recovery from error state
+                await db.rollback()
+                
+                # Reload run_rec since it's detached
+                run_rec = await db.get(AnalysisRun, run_id)
+                if run_rec:
+                    run_rec.status = 'failed'
+                    run_rec.error_message = str(e)[:255] # truncation
+                    await db.commit()
+                # raise e # Optionally re-raise if we want crash, but better to exit cleanly?
+                # Actually re-raising helps seeing it in CLI output if logger is redirected.
+                # But we printed already.
+
                 raise e
     
     asyncio.run(_do())

@@ -1,0 +1,164 @@
+[
+  {
+    "symbol_id": 11,
+    "symbol": "MBB",
+    "run_id": "2219723c-2bee-4d5f-9c4a-86a2b0358690",
+    "score_total": 78.0,
+    "breakdown": {
+      "trend": 100,
+      "base": 100,
+      "breakout": 0,
+      "volume": 100,
+      "momentum": 100,
+      "risk": 100
+    },
+    "penalties": [],
+    "row": {
+      "symbol_id": 11,
+      "timeframe_id": 1,
+      "ts": "2026-02-06 00:00:00+07:00",
+      "open": 27.0,
+      "high": 28.1,
+      "low": 26.45,
+      "close": 27.35,
+      "volume": 49957800.0,
+      "source": "vnstock",
+      "ingested_at": "2026-02-08 15:12:31.749262+07:00",
+      "ema20": 26.9337517133191,
+      "ema50": 26.200685782523575,
+      "rsi": 57.22444534880456,
+      "atr": 0.7686716318681457,
+      "vol_ma20": 30985935.0,
+      "bb_mid": 27.1625,
+      "bb_std": 0.4841908605845991,
+      "bb_upper": 28.1308817211692,
+      "bb_lower": 26.194118278830803,
+      "bb_width": 0.07130284187163906,
+      "high_20": 28.3,
+      "low_20": 26.0
+    },
+    "signal": {
+      "entry_zone": {
+        "from": 27.35,
+        "to": 27.62
+      },
+      "stop_loss": 26.55,
+      "take_profit_1": 28.82,
+      "take_profit_2": 29.62,
+      "invalidation": {
+        "level": 26.55,
+        "type": "technical_support"
+      },
+      "key_reasons": [],
+      "risk_notes": []
+    }
+  },
+  {
+    "symbol_id": 4,
+    "symbol": "BVH",
+    "run_id": "2219723c-2bee-4d5f-9c4a-86a2b0358690",
+    "score_total": 70.2,
+    "breakdown": {
+      "trend": 100,
+      "base": 100,
+      "breakout": 0,
+      "volume": 70,
+      "momentum": 100,
+      "risk": 70
+    },
+    "penalties": [],
+    "row": {
+      "symbol_id": 4,
+      "timeframe_id": 1,
+      "ts": "2026-02-06 00:00:00+07:00",
+      "open": 77.5,
+      "high": 82.0,
+      "low": 75.2,
+      "close": 78.0,
+      "volume": 1731400.0,
+      "source": "vnstock",
+      "ingested_at": "2026-02-08 15:11:54.751356+07:00",
+      "ema20": 72.27116581605063,
+      "ema50": 65.52412314022679,
+      "rsi": 64.4551441681277,
+      "atr": 4.164774940951016,
+      "vol_ma20": 1593060.0,
+      "bb_mid": 72.725,
+      "bb_std": 4.53244154025051,
+      "bb_upper": 81.78988308050101,
+      "bb_lower": 63.660116919498975,
+      "bb_width": 0.24929207509112464,
+      "high_20": 84.5,
+      "low_20": 64.1
+    },
+    "signal": {
+      "entry_zone": {
+        "from": 78.0,
+        "to": 78.78
+      },
+      "stop_loss": 70.19,
+      "take_profit_1": 90.5,
+      "take_profit_2": 98.31,
+      "invalidation": {
+        "level": 70.19,
+        "type": "technical_support"
+      },
+      "key_reasons": [],
+      "risk_notes": []
+    }
+  },
+  {
+    "symbol_id": 3,
+    "symbol": "BID",
+    "run_id": "2219723c-2bee-4d5f-9c4a-86a2b0358690",
+    "score_total": 67.2,
+    "breakdown": {
+      "trend": 100,
+      "base": 100,
+      "breakout": 0,
+      "volume": 40,
+      "momentum": 100,
+      "risk": 100
+    },
+    "penalties": [],
+    "row": {
+      "symbol_id": 3,
+      "timeframe_id": 1,
+      "ts": "2026-02-06 00:00:00+07:00",
+      "open": 50.7,
+      "high": 52.3,
+      "low": 50.7,
+      "close": 51.4,
+      "volume": 9885700.0,
+      "source": "vnstock",
+      "ingested_at": "2026-02-08 15:11:49.402515+07:00",
+      "ema20": 50.75968531042927,
+      "ema50": 46.29677294403485,
+      "rsi": 57.18967117227841,
+      "atr": 2.3362453704445905,
+      "vol_ma20": 13437535.0,
+      "bb_mid": 52.2675,
+      "bb_std": 1.4330933601641092,
+      "bb_upper": 55.133686720328214,
+      "bb_lower": 49.40131327967178,
+      "bb_width": 0.10967376363239932,
+      "high_20": 56.6,
+      "low_20": 47.0
+    },
+    "signal": {
+      "entry_zone": {
+        "from": 51.4,
+        "to": 51.91
+      },
+      "stop_loss": 49.59,
+      "take_profit_1": 54.63,
+      "take_profit_2": 56.44,
+      "invalidation": {
+        "level": 49.59,
+        "type": "technical_support"
+      },
+      "key_reasons": [],
+      "risk_notes": []
+    }
+  }
+]

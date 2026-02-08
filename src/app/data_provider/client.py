@@ -8,6 +8,8 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.app.db.models import OhlcvBar, MarketSymbol, DataFetchLog, Timeframe
 from src.app.core.config import settings
+from src.app.db.session import AsyncSessionLocal
+
 
 # Import vnstock
 try:
@@ -103,19 +105,40 @@ class DataProvider:
         fetch_end = end_dt.strftime('%Y-%m-%d')
 
         if fetch_needed:
+            # Rate Limit Enforcement: 5s delay to stay under 20 req/min (guest limit)
+            # 60s / 20req = 3s/req. We use 5s to be safe.
+            await asyncio.sleep(5)
+            
             logger.info(f"Fetching {symbol} from {fetch_start} to {fetch_end}")
             try:
                 df_new = await asyncio.to_thread(
                     self.client.fetch_ohlcv, symbol, fetch_start, fetch_end, timeframe
                 )
                 if df_new is not None and not df_new.empty:
-                    await self._save_ohlcv(df_new, sym.symbol_id, tf.timeframe_id)
-                    # Refresh DB rows
-                    rows = (await self.db.execute(stmt)).scalars().all()
+                    try:
+                        # Use ISOLATED session to prevent main session invalidation on error
+                        async with AsyncSessionLocal() as temp_db:
+                            await self._save_ohlcv(df_new, sym.symbol_id, tf.timeframe_id, db_session=temp_db)
+                            await temp_db.commit()
+                            
+                        # Refresh DB rows using main session (should see committed data)
+                        # We might need to expire session to see new data?
+                        # await self.db.expire_all() # safe?
+                        rows = (await self.db.execute(stmt)).scalars().all()
+                    except Exception as db_err:
+                         logger.error(f"DB Error saving {symbol}: {db_err}")
+                         # Isolated session rollback happened automatically on exit
+                         # Main session is safe. We just miss the new data.
+                         pass
+
+
             except Exception as e:
                 logger.error(f"Failed to fetch/save: {e}")
-                # Continue with what we have? Or raise?
+                # Do not rollback here; let caller handle session state.
+                # Continue with what we have (db data)
                 pass
+
+
         
         # Convert to DataFrame
         if not rows:
@@ -130,7 +153,9 @@ class DataProvider:
             
         return df
 
-    async def _save_ohlcv(self, df: pd.DataFrame, symbol_id: int, timeframe_id: int):
+    async def _save_ohlcv(self, df: pd.DataFrame, symbol_id: int, timeframe_id: int, db_session: AsyncSession = None):
+        session = db_session or self.db
+
         # Map df columns to DB
         # vnstock: time, open, high, low, close, volume, ticker
         records = []
@@ -167,5 +192,7 @@ class DataProvider:
                 'ingested_at': stmt.excluded.ingested_at
             }
         )
-        await self.db.execute(stmt)
-        await self.db.commit()
+        await session.execute(stmt)
+
+        # return result # optional
+
