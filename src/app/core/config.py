@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     
     # Scheduler
     SCHEDULE_INTERVAL_MINUTES: int = 60
+    
+    # VNStock API
+    VNSTOCK_API_KEY: str = ""
 
     class Config:
         env_file = ".env"

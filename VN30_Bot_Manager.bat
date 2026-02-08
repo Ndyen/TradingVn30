@@ -28,21 +28,21 @@ goto menu
 cls
 echo [INFO] Starting Scheduler (Running every 60 mins)...
 echo [INFO] Press Ctrl+C to stop.
-python -m src.app.cli.main schedule
+"C:\Users\84378\.venv\Scripts\python.exe" -m src.app.cli.main schedule
 pause
 goto menu
 
 :report
 cls
 echo [INFO] Generating Report and Sending to Telegram...
-python send_report_now.py
+"C:\Users\84378\.venv\Scripts\python.exe" send_report_now.py
 pause
 goto menu
 
 :backfill
 cls
 echo [INFO] Backfilling OHLCV Data (Last 5 Days)...
-python -m src.app.cli.main backfill-ohlcv --days 5
+"C:\Users\84378\.venv\Scripts\python.exe" -m src.app.cli.main backfill-ohlcv --days 5
 pause
 goto menu
 

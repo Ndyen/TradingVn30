@@ -14,6 +14,8 @@ from sqlalchemy import select
 
 # Fix for Windows asyncio loop
 if sys.platform == 'win32':
+    import warnings
+    warnings.filterwarnings("ignore", message=".*WindowsSelectorEventLoopPolicy.*")
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 # Configure logging
@@ -39,8 +41,10 @@ def update_universe(source: str = "vnstock"):
     Fetch VN30 constituents and update DB.
     """
     async def _do():
+        from src.app.core.config import settings
         async with AsyncSessionLocal() as db:
-            um = UniverseManager(db)
+            api_key = getattr(settings, 'VNSTOCK_API_KEY', None)
+            um = UniverseManager(db, api_key=api_key)
             await um.update_vn30(source=source)
     
     asyncio.run(_do())
@@ -93,6 +97,7 @@ def run(
     from sqlalchemy.dialects.postgresql import insert
     from src.app.notification.telegram import TelegramBot
     import uuid
+    from datetime import datetime
 
     
     async def _do():

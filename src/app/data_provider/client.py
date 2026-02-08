@@ -14,17 +14,35 @@ from src.app.db.session import AsyncSessionLocal
 # Import vnstock
 try:
     from vnstock import Quote
+    try:
+        from vnstock import register_user
+    except ImportError:
+        register_user = None
 except ImportError:
     Quote = None
+    register_user = None
     import traceback
     traceback.print_exc()
 
 logger = logging.getLogger(__name__)
 
 class VnStockClient:
-    def __init__(self):
+    def __init__(self, api_key: str = None):
         if Quote is None:
              logger.warning("vnstock.Quote not available")
+        self.api_key = api_key
+        
+        # Register API key globally if available (vnstock 3.4.2+)
+        if self.api_key and register_user:
+            try:
+                # register_user returns True/False, doesn't raise usually
+                is_reg = register_user(self.api_key)
+                if is_reg:
+                    logger.info("Successfully registered vnstock API key")
+                else:
+                    logger.warning("Failed to register vnstock API key")
+            except Exception as e:
+                logger.warning(f"Error registering vnstock API key: {e}")
 
     def fetch_ohlcv(self, symbol: str, start_date: str, end_date: str, resolution: str = "1D"):
         if Quote is None:
@@ -35,8 +53,28 @@ class VnStockClient:
             res_map = {'15m': '15m', '15': '15m'} 
             res = res_map.get(resolution, resolution)
             
-            # Instantiate Quote for this symbol
-            quote = Quote(symbol=symbol, source='vci', show_log=False)
+            # Instantiate Quote
+            try:
+                # Try new way first (global auth, no api_key param)
+                # But wait, if we are on OLD version, we MUST pass api_key to Quote?
+                # Actually, check logic:
+                # If register_user exists, we are likely on new version -> use Quote without api_key
+                # If register_user is None, we are on old version -> try Quote with api_key
+                
+                if register_user is not None:
+                     quote = Quote(symbol=symbol, source='vci', show_log=False)
+                else:
+                    # Old version fallback
+                    if self.api_key:
+                        quote = Quote(symbol=symbol, source='vci', api_key=self.api_key, show_log=False)
+                    else:
+                        quote = Quote(symbol=symbol, source='vci', show_log=False)
+                        
+            except TypeError:
+                # If we tried passing api_key and it failed (e.g. intermediate version?)
+                # Or came here because logic above was imperfect
+                logger.debug(f"vnstock Quote instantiation retry for {symbol}")
+                quote = Quote(symbol=symbol, source='vci', show_log=False)
             
             df = quote.history(start=start_date, end=end_date, interval=res)
             return df
@@ -47,7 +85,10 @@ class VnStockClient:
 class DataProvider:
     def __init__(self, db: AsyncSession):
         self.db = db
-        self.client = VnStockClient()
+        # Pass API key from settings to VnStockClient
+        api_key = getattr(settings, 'VNSTOCK_API_KEY', None)
+        self.client = VnStockClient(api_key=api_key)
+        self.has_premium = bool(api_key)
 
     async def get_ohlcv(self, symbol: str, timeframe: str = "1D", days: int = 365) -> pd.DataFrame:
         """
@@ -105,9 +146,10 @@ class DataProvider:
         fetch_end = end_dt.strftime('%Y-%m-%d')
 
         if fetch_needed:
-            # Rate Limit Enforcement: 5s delay to stay under 20 req/min (guest limit)
-            # 60s / 20req = 3s/req. We use 5s to be safe.
-            await asyncio.sleep(5)
+            # Rate Limit Enforcement: Only for free tier
+            # Premium key: no rate limit. Free tier: 5s delay to stay under 20 req/min
+            if not self.has_premium:
+                await asyncio.sleep(5)
             
             logger.info(f"Fetching {symbol} from {fetch_start} to {fetch_end}")
             try:

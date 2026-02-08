@@ -31,41 +31,11 @@ async def pipeline_job():
     await bot.send_message("⏰ Scheduled Analysis Run Started.")
     
     try:
-        # 1. Backfill (Last 5 days to be safe and fast)
-        logger.info("Step 1: Backfilling data...")
-        # We need to replicate backfill logic slightly or call CLI function?
-        # Replicating logic is cleaner for a library.
-        # But for MVP, let's call the CLI command via subprocess?
-        # No, subprocess is heavy. Let's use the code we verified in debug_report.py but modularized.
+        # Note: Backfill step removed due to Windows subprocess limitation
+        # Data should be manually updated or scheduled separately
+        # Scheduler focuses on analyzing existing data
         
-        # 1. Backfill (Last 5 days to be safe and fast)
-        logger.info("Step 1: Backfilling data...")
-        
-        # We rely entirely on the CLI command for backfill to ensure consistency and use the rate-limited DataProvider.
-
-
-        # Usage of CLI via subprocess for robustness
-        import sys
-        
-        cmd = [sys.executable, "-m", "src.app.cli.main", "backfill-ohlcv", "--days", "5"]
-        logger.info(f"Running command: {' '.join(cmd)}")
-        
-        proc = await asyncio.create_subprocess_exec(
-            *cmd,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-        stdout, stderr = await proc.communicate()
-        
-        if proc.returncode != 0:
-            logger.error(f"Backfill subprocess failed with code {proc.returncode}")
-            logger.error(f"STDOUT: {stdout.decode()}")
-            logger.error(f"STDERR: {stderr.decode()}")
-            await bot.send_message("⚠️ Backfill step failed. Analysis may be stale.")
-        else:
-            logger.info("Backfill subprocess finished successfully.")
-
-        # 2. Analysis
+        # Analysis
         logger.info("Step 2: Running Analysis...")
         # Since we have ORM issues, let's look at how we want to run analysis.
         # debug_report.py worked well. Let's adapt it here.
@@ -81,23 +51,32 @@ async def pipeline_job():
              run_id = uuid.uuid4()
              
              for sym, sym_id in symbols_map.items():
-                 query = text(f"SELECT ts, open, high, low, close, volume FROM trading.ohlcv_bar WHERE symbol_id = {sym_id} ORDER BY ts ASC")
-                 rows = (await db.execute(query)).fetchall()
-                 if not rows or len(rows) < 30: continue
-                 
-                 df = pd.DataFrame(rows, columns=['ts', 'open', 'high', 'low', 'close', 'volume'])
-                 df[['open', 'high', 'low', 'close', 'volume']] = df[['open', 'high', 'low', 'close', 'volume']].apply(pd.to_numeric)
-                 
-                 df = calculate_indicators(df)
-                 score_res = Scorer().calculate_score(df)
-                 signal_res = generate_trade_plan(df, score_res)
-                 
-                 results.append({
-                     "symbol": sym,
-                     "score_total": score_res['score_total'],
-                     "breakdown": score_res['breakdown'],
-                     "signal": signal_res
-                 })
+                 try:
+                     query = text(f"SELECT ts, open, high, low, close, volume FROM trading.ohlcv_bar WHERE symbol_id = {sym_id} ORDER BY ts ASC")
+                     rows = (await db.execute(query)).fetchall()
+                     if not rows or len(rows) < 30:
+                         logger.debug(f"Skipping {sym}: insufficient data")
+                         continue
+                     
+                     df = pd.DataFrame(rows, columns=['ts', 'open', 'high', 'low', 'close', 'volume'])
+                     df[['open', 'high', 'low', 'close', 'volume']] = df[['open', 'high', 'low', 'close', 'volume']].apply(pd.to_numeric)
+                     
+                     df = calculate_indicators(df)
+                     score_res = Scorer().calculate_score(df)
+                     signal_res = generate_trade_plan(df, score_res)
+                     
+                     results.append({
+                         "symbol": sym,
+                         "score_total": score_res['score_total'],
+                         "breakdown": score_res['breakdown'],
+                         "signal": signal_res
+                     })
+                     logger.debug(f"✅ {sym}: Score = {score_res['score_total']}")
+                     
+                 except Exception as e:
+                     logger.error(f"Error processing {sym}: {e}")
+                     # Continue with next symbol instead of failing entire pipeline
+                     continue
                  
              # Sort and Report
              results.sort(key=lambda x: x['score_total'], reverse=True)
@@ -109,6 +88,8 @@ async def pipeline_job():
 
     except Exception as e:
         logger.error(f"Pipeline failed: {e}")
+        import traceback
+        traceback.print_exc()
         await bot.send_message(f"❌ Analysis failed: {e}")
 
 def start_scheduler():

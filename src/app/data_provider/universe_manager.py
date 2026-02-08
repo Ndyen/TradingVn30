@@ -13,8 +13,9 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 class UniverseManager:
-    def __init__(self, db: AsyncSession):
+    def __init__(self, db: AsyncSession, api_key: str = None):
         self.db = db
+        self.api_key = api_key
 
     async def update_vn30(self, source: str = "vnstock", file_path: str = "vn30.txt"):
         """
@@ -32,7 +33,17 @@ class UniverseManager:
         symbols = []
         if source == "vnstock" and Listing is not None:
              try:
-                 lst = Listing(source='vci', show_log=False)
+                 # Try with API key first (vnstock 3.4.2+)
+                 try:
+                     if self.api_key:
+                         lst = Listing(source='vci', api_key=self.api_key, show_log=False)
+                     else:
+                         lst = Listing(source='vci', show_log=False)
+                 except TypeError:
+                     # Fallback: older vnstock version doesn't support api_key
+                     logger.warning("vnstock Listing doesn't support api_key parameter, using without API key")
+                     lst = Listing(source='vci', show_log=False)
+                 
                  # symbols_by_group("VN30")
                  df = lst.symbols_by_group(group='VN30')
                  if not df.empty and 'ticker' in df.columns:
@@ -77,8 +88,9 @@ class UniverseManager:
                 UniverseMember.universe_id == univ.universe_id,
                 UniverseMember.symbol_id == sym.symbol_id,
                 UniverseMember.effective_to.is_(None)
-            )
-            mem = (await self.db.execute(mem_stmt)).scalar_one_or_none()
+            ).distinct()
+            # Use first() instead of scalar_one_or_none() to handle duplicates gracefully
+            mem = (await self.db.execute(mem_stmt)).scalars().first()
             
             if not mem:
                 # Add new membership

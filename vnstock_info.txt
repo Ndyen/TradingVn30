@@ -1,6 +1,0 @@
-File: C:\Users\84378\AppData\Local\Programs\Python\Python310\lib\site-packages\vnstock\__init__.py
-Dir: ['Company', 'EXCHANGES', 'Finance', 'Fund', 'INDEX_GROUPS', 'INDICES_INFO', 'INDICES_MAP', 'Listing', 'Quote', 'SECTOR_IDS', 'Screener', 'Trading', 'Vnstock', '_Vnstock', '__all__', '__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__path__', '__spec__', '_ensure_explorer_modules_loaded', '_ensure_vnai_initialized', '_explorer_modules_loaded', '_get_vnstock', '_vnai_initialized', 'api', 'base', 'change_api_key', 'check_status', 'config', 'connector', 'constants', 'core', 'explorer', 'register_user', 'update_notice', 'vnai']
-Has stock_historical_data: False
-Has listing_companies: False
-Checking submodules...
-No vnstock.stock
